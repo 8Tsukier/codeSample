@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<entity-mappings
+        xmlns="http://java.sun.com/xml/ns/persistence/orm"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://java.sun.com/xml/ns/persistence/orm http://java.sun.com/xml/ns/persistence/orm_2_0.xsd"
+        version="2.0">
+
+    <!-- Schueler (SchuelerRepository) -->
+    <named-query name="Schueler.findSchuelerByFamnameAndVornameAll">
+        <query><![CDATA[SELECT DISTINCT NEW at.bitmedia.kiga.backend.data.entity.Schueler(sch.sgKennzahl, sch.sgFamName, sch.sgVorname1, sch.sgGeburtDat, sch.sgSex, sch.sgBpknr, sch.updatedate, sch.updateuser, (select addr.gmId from Schueleradresse addr where addr.gmId is not null and addr.sgKennzahl = sch.sgKennzahl and rownum < 2), (SELECT COUNT(DISTINCT sk.suKennzahl) FROM Schuelerlaufbahn sk, Schule su WHERE sk.suKennzahl = su.suKennzahl and sk.sgKennzahl = sch.sgKennzahl AND su.suVersion = 'KIB' )) FROM SU2GMZuordnung sgz, Schueleradresse addr, Schueler sch where sgz.gmId = addr.gmId and sch.sgKennzahl = addr.sgKennzahl and sgz.suKennzahl in (:schoolIds) and (SELECT COUNT(DISTINCT sk.suKennzahl) FROM Schuelerlaufbahn sk, Schule su WHERE sk.suKennzahl = su.suKennzahl and sk.sgKennzahl = sch.sgKennzahl AND :endDate BETWEEN trunc(sk.skVon) AND trunc(sk.skBis) AND su.suVersion = 'KIB' ) > 0 and lower(sch.sgFamName) LIKE lower(:famname) AND lower(sch.sgVorname1) LIKE lower(:vorname) AND ((extract(YEAR FROM :endDate)*10000 + extract(MONTH FROM :endDate) * 100 + extract(DAY FROM :endDate)) - (extract(YEAR FROM sch.sgGeburtDat) * 10000 + extract(MONTH FROM sch.sgGeburtDat) * 100 + extract(DAY FROM sch.sgGeburtDat))) BETWEEN (:minAge * 10000) AND ((:maxAge+1) * 10000 - 1) ORDER BY sch.sgFamName]]></query>
+    </named-query>
+    
+    <named-query name="Schueler.findSchuelerByFamnameAndVornameAllwoLaufbahn">
+<!--         <query><![CDATA[SELECT DISTINCT sch FROM Schueler sch LEFT JOIN FETCH sch.addresses WHERE (sch.sgKennzahl NOT IN (SELECT sk.sgKennzahl FROM Schuelerlaufbahn sk)) AND lower(sch.sgFamName) LIKE lower(:famname) AND lower(sch.sgVorname1) LIKE lower(:vorname) AND ((extract(YEAR FROM :endDate)*10000 + extract(MONTH FROM :endDate) * 100 + extract(DAY FROM :endDate)) - (extract(YEAR FROM sch.sgGeburtDat) * 10000 + extract(MONTH FROM sch.sgGeburtDat) * 100 + extract(DAY FROM sch.sgGeburtDat))) BETWEEN (:minAge * 10000) AND ((:maxAge+1) * 10000 - 1) ORDER BY sch.sgFamName]]></query> -->
+        <query><![CDATA[SELECT DISTINCT NEW at.bitmedia.kiga.backend.data.entity.Schueler(sch.sgKennzahl, sch.sgFamName, sch.sgVorname1, sch.sgGeburtDat, sch.sgSex, sch.sgBpknr, sch.updatedate, sch.updateuser, (select addr.gmId from Schueleradresse addr where addr.gmId is not null and addr.sgKennzahl = sch.sgKennzahl and rownum < 2), (SELECT COUNT(DISTINCT sk.suKennzahl) FROM Schuelerlaufbahn sk, Schule su WHERE sk.suKennzahl = su.suKennzahl and sk.sgKennzahl = sch.sgKennzahl AND su.suVersion = 'KIB' AND :endDate between sk.skVon AND sk.skBis AND su.suKennzahl != :actualSuKennzahl)) FROM SU2GMZuordnung sgz, Schueleradresse addr, Schueler sch where sgz.gmId = addr.gmId and sch.sgKennzahl = addr.sgKennzahl and sgz.suKennzahl in (:schoolIds) and (SELECT COUNT(DISTINCT sk.suKennzahl) FROM Schuelerlaufbahn sk, Schule su WHERE sk.suKennzahl = su.suKennzahl and sk.sgKennzahl = sch.sgKennzahl AND :endDate BETWEEN trunc(sk.skVon) AND trunc(sk.skBis) AND su.suVersion = 'KIB' ) = 0 and lower(sch.sgFamName) LIKE lower(:famname) AND lower(sch.sgVorname1) LIKE lower(:vorname) AND ((extract(YEAR FROM :endDate)*10000 + extract(MONTH FROM :endDate) * 100 + extract(DAY FROM :endDate)) - (extract(YEAR FROM sch.sgGeburtDat) * 10000 + extract(MONTH FROM sch.sgGeburtDat) * 100 + extract(DAY FROM sch.sgGeburtDat))) BETWEEN (:minAge * 10000) AND ((:maxAge+1) * 10000 - 1) ORDER BY sch.sgFamName]]></query>
+    </named-query>
+
+    <named-query name="Schueler.findSchuelerByFamnameAndVornameAndDate">
+        <query><![CDATA[SELECT DISTINCT NEW at.bitmedia.kiga.backend.data.entity.Schueler(sch.sgKennzahl, sch.sgFamName, sch.sgVorname1, sch.sgGeburtDat, sch.sgSex, sch.sgBpknr, sch.updatedate, sch.updateuser, (select addr.gmId from Schueleradresse addr where addr.gmId is not null and addr.sgKennzahl = sch.sgKennzahl and rownum < 2), (SELECT COUNT(DISTINCT sk.suKennzahl) FROM Schuelerlaufbahn sk, Schule su WHERE sk.suKennzahl = su.suKennzahl and sk.sgKennzahl = sch.sgKennzahl AND su.suVersion = 'KIB' )) FROM SU2GMZuordnung sgz, Schueleradresse addr, Schueler sch where sgz.gmId = addr.gmId and sch.sgKennzahl = addr.sgKennzahl and sgz.suKennzahl in (:schoolIds) and (SELECT COUNT(DISTINCT sk.suKennzahl) FROM Schuelerlaufbahn sk, Schule su WHERE sk.suKennzahl = su.suKennzahl and sk.sgKennzahl = sch.sgKennzahl AND :endDate BETWEEN trunc(sk.skVon) AND trunc(sk.skBis) AND su.suVersion = 'KIB' ) > 0 AND lower(sch.sgFamName) like lower(:famname) AND lower(sch.sgVorname1) like lower(:vorname) AND ((extract(YEAR FROM :endDate)*10000 + extract(MONTH FROM :endDate) * 100 + extract(DAY FROM :endDate)) - (extract(YEAR FROM sch.sgGeburtDat) * 10000 + extract(MONTH FROM sch.sgGeburtDat) * 100 + extract(DAY FROM sch.sgGeburtDat))) BETWEEN (:years * 10000) AND ((:years+1) * 10000 - 1) order by sch.sgFamName]]></query>
+    </named-query>
+    
+    <named-query name="Schueler.findSchuelerByFamnameAndVornameAndDateWoLaufbahn">
+<!--         <query><![CDATA[SELECT distinct sch FROM Schueler sch LEFT JOIN FETCH sch.addresses WHERE (sch.sgKennzahl NOT IN (SELECT sk.sgKennzahl FROM Schuelerlaufbahn sk)) AND lower(sch.sgFamName) like lower(:famname) AND lower(sch.sgVorname1) like lower(:vorname) AND ((extract(YEAR FROM :endDate)*10000 + extract(MONTH FROM :endDate) * 100 + extract(DAY FROM :endDate)) - (extract(YEAR FROM sch.sgGeburtDat) * 10000 + extract(MONTH FROM sch.sgGeburtDat) * 100 + extract(DAY FROM sch.sgGeburtDat))) BETWEEN (:years * 10000) AND ((:years+1) * 10000 - 1) order by sch.sgFamName]]></query> -->
+        <query><![CDATA[SELECT DISTINCT NEW at.bitmedia.kiga.backend.data.entity.Schueler(sch.sgKennzahl, sch.sgFamName, sch.sgVorname1, sch.sgGeburtDat, sch.sgSex, sch.sgBpknr, sch.updatedate, sch.updateuser, (select addr.gmId from Schueleradresse addr where addr.gmId is not null and addr.sgKennzahl = sch.sgKennzahl and rownum < 2), (SELECT COUNT(DISTINCT sk.suKennzahl) FROM Schuelerlaufbahn sk, Schule su WHERE sk.suKennzahl = su.suKennzahl and sk.sgKennzahl = sch.sgKennzahl AND su.suVersion = 'KIB' )) FROM SU2GMZuordnung sgz, Schueleradresse addr, Schueler sch where sgz.gmId = addr.gmId and sch.sgKennzahl = addr.sgKennzahl and sgz.suKennzahl in (:schoolIds) and (SELECT COUNT(DISTINCT sk.suKennzahl) FROM Schuelerlaufbahn sk, Schule su WHERE sk.suKennzahl = su.suKennzahl and sk.sgKennzahl = sch.sgKennzahl AND :endDate BETWEEN trunc(sk.skVon) AND trunc(sk.skBis) AND su.suVersion = 'KIB' ) = 0 and lower(sch.sgFamName) LIKE lower(:famname) AND lower(sch.sgVorname1) LIKE lower(:vorname) AND ((extract(YEAR FROM :endDate)*10000 + extract(MONTH FROM :endDate) * 100 + extract(DAY FROM :endDate)) - (extract(YEAR FROM sch.sgGeburtDat) * 10000 + extract(MONTH FROM sch.sgGeburtDat) * 100 + extract(DAY FROM sch.sgGeburtDat))) BETWEEN (:years * 10000) AND ((:years+1) * 10000 - 1) order by sch.sgFamName]]></query>
+    </named-query>
+    
+    <named-query name="Schueler.findCountByFamnameAndVornameAll">
+        <query><![CDATA[SELECT count(DISTINCT sch) FROM SU2GMZuordnung sgz, Schueleradresse addr, Schueler sch where sgz.gmId = addr.gmId and sch.sgKennzahl = addr.sgKennzahl and sgz.suKennzahl in (:schoolIds) and (SELECT COUNT(DISTINCT sk.suKennzahl) FROM Schuelerlaufbahn sk, Schule su WHERE sk.suKennzahl = su.suKennzahl and sk.sgKennzahl = sch.sgKennzahl AND :endDate BETWEEN trunc(sk.skVon) AND trunc(sk.skBis) AND su.suVersion = 'KIB' ) > 0 and lower(sch.sgFamName) LIKE lower(:famname) AND lower(sch.sgVorname1) LIKE lower(:vorname) AND ((extract(YEAR FROM :endDate)*10000 + extract(MONTH FROM :endDate) * 100 + extract(DAY FROM :endDate)) - (extract(YEAR FROM sch.sgGeburtDat) * 10000 + extract(MONTH FROM sch.sgGeburtDat) * 100 + extract(DAY FROM sch.sgGeburtDat))) BETWEEN (:minAge * 10000) AND ((:maxAge+1) * 10000 - 1)]]></query>
+    </named-query>
+
+    <named-query name="Schueler.findCountByFamnameAndVornameAllwoLaufbahn">
+<!--         <query><![CDATA[SELECT count(sch) FROM Schueler sch WHERE (sch.sgKennzahl NOT IN (SELECT sk.sgKennzahl FROM Schuelerlaufbahn sk)) AND lower(sch.sgFamName) LIKE lower(:famname) AND lower(sch.sgVorname1) LIKE lower(:vorname) AND ((extract(YEAR FROM :endDate)*10000 + extract(MONTH FROM :endDate) * 100 + extract(DAY FROM :endDate)) - (extract(YEAR FROM sch.sgGeburtDat) * 10000 + extract(MONTH FROM sch.sgGeburtDat) * 100 + extract(DAY FROM sch.sgGeburtDat))) BETWEEN (:minAge * 10000) AND ((:maxAge+1) * 10000 - 1)]]></query> -->
+        <query><![CDATA[SELECT count(DISTINCT sch) FROM SU2GMZuordnung sgz, Schueleradresse addr, Schueler sch where sgz.gmId = addr.gmId and sch.sgKennzahl = addr.sgKennzahl and sgz.suKennzahl in (:schoolIds) and (SELECT COUNT(DISTINCT sk.suKennzahl) FROM Schuelerlaufbahn sk, Schule su WHERE sk.suKennzahl = su.suKennzahl and sk.sgKennzahl = sch.sgKennzahl AND :endDate BETWEEN trunc(sk.skVon) AND trunc(sk.skBis) AND su.suVersion = 'KIB' ) = 0 AND lower(sch.sgFamName) LIKE lower(:famname) AND lower(sch.sgVorname1) LIKE lower(:vorname) AND ((extract(YEAR FROM :endDate)*10000 + extract(MONTH FROM :endDate) * 100 + extract(DAY FROM :endDate)) - (extract(YEAR FROM sch.sgGeburtDat) * 10000 + extract(MONTH FROM sch.sgGeburtDat) * 100 + extract(DAY FROM sch.sgGeburtDat))) BETWEEN (:minAge * 10000) AND ((:maxAge+1) * 10000 - 1)]]></query>
+    </named-query>
+
+    <named-query name="Schueler.findCountByFamnameAndVornameAndAge">
+        <query><![CDATA[SELECT count(DISTINCT sch) FROM SU2GMZuordnung sgz, Schueleradresse addr, Schueler sch where sgz.gmId = addr.gmId and sch.sgKennzahl = addr.sgKennzahl and sgz.suKennzahl in (:schoolIds) and (SELECT COUNT(DISTINCT sk.suKennzahl) FROM Schuelerlaufbahn sk, Schule su WHERE sk.suKennzahl = su.suKennzahl and sk.sgKennzahl = sch.sgKennzahl AND :endDate BETWEEN trunc(sk.skVon) AND trunc(sk.skBis) AND su.suVersion = 'KIB' ) > 0 and lower(sch.sgFamName) like lower(:famname) AND lower(sch.sgVorname1) like lower(:vorname) AND ((extract(YEAR FROM :endDate)*10000 + extract(MONTH FROM :endDate) * 100 + extract(DAY FROM :endDate)) - (extract(YEAR FROM sch.sgGeburtDat) * 10000 + extract(MONTH FROM sch.sgGeburtDat) * 100 + extract(DAY FROM sch.sgGeburtDat))) BETWEEN (:years * 10000) AND ((:years+1) * 10000 - 1)]]></query>
+    </named-query>
+
+    <named-query name="Schueler.findCountByFamnameAndVornameAndSgGeburtDat">
+        <query><![CDATA[SELECT count(DISTINCT sch) FROM Schueler sch where lower(sch.sgFamName) like lower(:famname) and lower(sch.sgVorname1) like lower(:vorname) and sch.sgGeburtDat = :geburtdat]]></query>
+    </named-query>
+
+    <named-query name="Schueler.findByFamnameAndVornameAndSgGeburtDat">
+        <query><![CDATA[SELECT DISTINCT sch FROM Schueler sch where lower(sch.sgFamName) like lower(:famname) and lower(sch.sgVorname1) like lower(:vorname) and sch.sgGeburtDat = :geburtdat]]></query>
+    </named-query>
+
+    <named-query name="Schueler.findCountBySgSVNR">
+        <query><![CDATA[SELECT count(DISTINCT sch) FROM Schueler sch where lower(sch.SG_SVNR) like lower(:sgSVNR)]]></query>
+    </named-query>
+
+    <named-query name="Schueler.findBySgSVNR">
+        <query><![CDATA[SELECT DISTINCT sch FROM Schueler sch where lower(sch.SG_SVNR) like lower(:sgSVNR)]]></query>
+    </named-query>
+    
+    <named-query name="Schueler.findCountByFamnameAndVornameAndAgeWoLaufbahn">
+<!--         <query><![CDATA[SELECT distinct count(sch) FROM Schueler sch WHERE (sch.sgKennzahl NOT IN (SELECT sk.sgKennzahl FROM Schuelerlaufbahn sk)) AND lower(sch.sgFamName) like lower(:famname) AND lower(sch.sgVorname1) like lower(:vorname) AND ((extract(YEAR FROM :endDate)*10000 + extract(MONTH FROM :endDate) * 100 + extract(DAY FROM :endDate)) - (extract(YEAR FROM sch.sgGeburtDat) * 10000 + extract(MONTH FROM sch.sgGeburtDat) * 100 + extract(DAY FROM sch.sgGeburtDat))) BETWEEN (:years * 10000) AND ((:years+1) * 10000 - 1)]]></query> -->
+        <query><![CDATA[SELECT count(DISTINCT sch) FROM SU2GMZuordnung sgz, Schueleradresse addr, Schueler sch where sgz.gmId = addr.gmId and sch.sgKennzahl = addr.sgKennzahl and sgz.suKennzahl in (:schoolIds) and (SELECT COUNT(DISTINCT sk.suKennzahl) FROM Schuelerlaufbahn sk, Schule su WHERE sk.suKennzahl = su.suKennzahl and sk.sgKennzahl = sch.sgKennzahl AND :endDate BETWEEN trunc(sk.skVon) AND trunc(sk.skBis) AND su.suVersion = 'KIB' ) = 0 AND lower(sch.sgFamName) LIKE lower(:famname) AND lower(sch.sgVorname1) LIKE lower(:vorname) AND ((extract(YEAR FROM :endDate)*10000 + extract(MONTH FROM :endDate) * 100 + extract(DAY FROM :endDate)) - (extract(YEAR FROM sch.sgGeburtDat) * 10000 + extract(MONTH FROM sch.sgGeburtDat) * 100 + extract(DAY FROM sch.sgGeburtDat))) BETWEEN (:years * 10000) AND ((:years+1) * 10000 - 1)]]></query>
+    </named-query>
+
+    <named-query name="Schueler.findSchuelerByFamnameWithAllSchuelerlaufbahnSuKennzahl">
+        <query><![CDATA[SELECT DISTINCT sg FROM Schuelerlaufbahn sk, Schueler sg WHERE sk.id.sgKennzahl = sg.sgKennzahl AND sk.id.suKennzahl = :suKennzahl AND lower(sg.sgFamName) LIKE lower(:famname) ORDER BY sg.sgFamName]]></query>
+    </named-query>
+
+    <named-query name="Schueler.findSchuelerByFamnameWithAllSchuelerlaufbahnSuKennzahlAndGruppe">
+        <query><![CDATA[SELECT DISTINCT sg FROM Schuelerlaufbahn sk, Schueler sg, KbGruppezuord kbgz WHERE sk.id.sgKennzahl = sg.sgKennzahl AND sk.id.suKennzahl = :suKennzahl AND kbgz.sgKennzahl = sg.sgKennzahl AND lower(sg.sgFamName) LIKE lower(:famname) AND kbgz.kbgId = :kbgId ORDER BY sg.sgFamName]]></query>
+    </named-query>
+
+    <named-query name="Schueler.findSchuelerByFamnameWithSkkkzNotEAndSuKennzahl">
+        <query><![CDATA[SELECT DISTINCT sg FROM Schueler sg, KbGruppezuord kbgz WHERE kbgz.sgKennzahl = sg.sgKennzahl AND kbgz.suKennzahl = :suKennzahl AND lower(sg.sgFamName) LIKE lower(:famname) ORDER BY sg.sgFamName]]></query>
+    </named-query>
+
+    <named-query name="Schueler.findSchuelerByFamnameWithSkkkzNotEAndSuKennzahlAndBeforeBis">
+        <query><![CDATA[SELECT DISTINCT sg FROM Schueler sg, KbGruppezuord kbgz WHERE kbgz.sgKennzahl = sg.sgKennzahl AND kbgz.suKennzahl = :suKennzahl AND (:bisDate BETWEEN kbgz.kbgzVon AND kbgz.kbgzBis) AND lower(sg.sgFamName) LIKE lower(:famname) ORDER BY sg.sgFamName]]></query>
+    </named-query>
+
+    <named-query name="Schueler.findSchuelerByKB_Gruppe">
+        <query><![CDATA[SELECT DISTINCT sg FROM Schueler sg, Schuelerlaufbahn sk, KbGruppezuord kbgz WHERE sk.id.sgKennzahl = sg.sgKennzahl  AND kbgz.sgKennzahl = sg.sgKennzahl AND kbgz.suKennzahl = :suKennzahl AND ((kbgz.kbgId like :kbgId)OR(:kbgId IS NULL)) ORDER BY sg.sgFamName]]></query>
+    </named-query>
+    <named-query name="Schueler.findSchuelerByKB_GruppeAndSg">
+        <query><![CDATA[SELECT DISTINCT sg FROM Schueler sg, Schuelerlaufbahn sk, KbGruppezuord kbgz WHERE sk.id.sgKennzahl = sg.sgKennzahl  AND kbgz.sgKennzahl = sg.sgKennzahl AND kbgz.suKennzahl = :suKennzahl AND ((sg.sgKennzahl = :sgKennzahl)OR(:sgKennzahl IS NULL)) AND ((kbgz.kbgId like :kbgId)OR(:kbgId IS NULL)) ORDER BY sg.sgFamName]]></query>
+    </named-query>
+    <named-query name="Schueler.findNotAssignSchuelerByKB_Gruppe">
+        <query><![CDATA[SELECT DISTINCT sg FROM Schueler sg, Schuelerlaufbahn sk  WHERE  sk.id.sgKennzahl = sg.sgKennzahl AND sg.sgKennzahl not in (SELECT DISTINCT kbgz.sgKennzahl FROM KbGruppezuord kbgz) AND sk.suKennzahl = :suKennzahl  ORDER BY sg.sgFamName]]></query>
+    </named-query>
+    <named-query name="Schueler.findAssignSchuelerByKB_Gruppe">
+        <query><![CDATA[SELECT DISTINCT sg FROM Schueler sg, Schuelerlaufbahn sk, KbGruppezuord kbgz WHERE sk.id.sgKennzahl = sg.sgKennzahl  AND kbgz.sgKennzahl = sg.sgKennzahl AND kbgz.suKennzahl = :suKennzahl ORDER BY sg.sgFamName]]></query>
+    </named-query>
+    <named-query name="Schueler.findSchuelerBySuKennzahl">
+        <query><![CDATA[SELECT DISTINCT  pupil  FROM KbGruppezuord kbgz, Schueler pupil, KbModulezuord kbmz  WHERE kbgz.sgKennzahl = pupil.sgKennzahl AND kbgz.suKennzahl = kbmz.suKennzahl  AND pupil.sgKennzahl = kbmz.sgKennzahl AND kbmz.id.suKennzahl =:suKennzahl order by  pupil.sgFamName, pupil.sgVorname1  asc]]></query>
+    </named-query>
+    <named-query name="Schueler.findSchuelerBySuAndGroupWithModulesInDate">
+        <query><![CDATA[SELECT DISTINCT pupil FROM KbGruppezuord kbgz, Schueler pupil, Schuelerlaufbahn sk, KbModulezuord kbmz  WHERE kbmz.kbModule.uhrzeitVon IS NOT NULL AND kbmz.kbModule.uhrzeitBis IS NOT NULL AND sk.id.sgKennzahl = pupil.sgKennzahl AND kbgz.sgKennzahl = pupil.sgKennzahl AND kbgz.suKennzahl = kbmz.suKennzahl  AND pupil.sgKennzahl = kbmz.sgKennzahl AND kbmz.id.suKennzahl = :suKennzahl AND ((kbgz.kbgId like :kbgId)OR(:kbgId IS NULL)) AND ((:stichtag between kbmz.von and kbmz.bis)OR(:stichtag IS NULL)) AND ( (case when kbmz.day1 = true then 'MONDAY' else 'N' end = :dayOfWeek) or (case when kbmz.day2 = true then 'TUESDAY' else 'N' end = :dayOfWeek) or (case when kbmz.day3 = true then 'WEDNESDAY' else 'N' end = :dayOfWeek) or (case when kbmz.day4 = true then 'THURSDAY' else 'N' end = :dayOfWeek) or (case when kbmz.day5 = true then 'FRIDAY' else 'N' end = :dayOfWeek) or (case when kbmz.day6 = true then 'SATURDAY' else 'N' end = :dayOfWeek) or (case when kbmz.day7 = true then 'SUNDAY' else 'N' end = :dayOfWeek) ) order by pupil.sgFamName, pupil.sgVorname1 asc]]></query>
+    </named-query>
+
+<!--    For checkliste-->
+    <named-query name="Schueler.findSchuelerByLaufbahnAndVornameAndNachnameForCheckliste">
+        <query><![CDATA[SELECT distinct pupil FROM Schueler pupil, KbGruppezuord g LEFT JOIN KbAnwesend kba ON pupil.sgKennzahl = kba.sgKennzahl and kba.suKennzahl = :suKennzahl WHERE  lower(pupil.sgFamName) like lower(:famname) AND lower(pupil.sgVorname1) like lower(:vorname) AND pupil.sgKennzahl = g.sgKennzahl AND g.suKennzahl = :suKennzahl AND isKIBda(:suKennzahl, pupil.sgKennzahl, :stichtag) = 1 ORDER BY pupil.sgFamName]]></query>
+    </named-query>
+
+    <named-query name="Schueler.findSchuelerByLaufbahnAndVornameAndNachnameAndGroupForCheckliste">
+        <query><![CDATA[SELECT distinct pupil FROM Schueler pupil, KbGruppezuord g LEFT JOIN KbAnwesend kba ON pupil.sgKennzahl = kba.sgKennzahl and kba.suKennzahl = :suKennzahl WHERE  lower(pupil.sgFamName) like lower(:famname) AND lower(pupil.sgVorname1) like lower(:vorname) AND pupil.sgKennzahl = g.sgKennzahl AND g.suKennzahl = :suKennzahl AND :groupId like g.kbgId AND isKIBda(:suKennzahl, pupil.sgKennzahl, :stichtag) = 1 ORDER BY pupil.sgFamName]]></query>
+    </named-query>
+
+    <named-query name="KbAnwesend.findKbAnwesendBySgKennzahl">
+        <query><![CDATA[SELECT kba FROM KbAnwesend kba WHERE  kba.sgKennzahl = :sgKennzahl]]></query>
+    </named-query>
+
+    <named-query name="Schueler.findSchuelerByStichtagVornameNachnameAndGrName">
+         <query><![CDATA[SELECT DISTINCT pupil FROM Schueler pupil, KbGruppezuord g left join KB_Gruppe gr on g.kbgId = gr.kbgId WHERE lower(pupil.sgFamName) LIKE lower(:famname) AND lower(pupil.sgVorname1) LIKE lower(:vorname) AND pupil.sgKennzahl = g.sgKennzahl AND g.suKennzahl = :suKennzahl and gr.kbgName like :grName AND :stichtag BETWEEN g.kbgzVon AND g.kbgzBis ORDER BY pupil.sgFamName]]></query>
+    </named-query>
+
+</entity-mappings>
